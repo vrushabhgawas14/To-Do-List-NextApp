@@ -1,0 +1,11 @@
+node_modules/
+.cache/
+.github/
+assets/
+public/
+.env.development
+LICENSE
+README.md
+package.json
+package-lock.json
+
