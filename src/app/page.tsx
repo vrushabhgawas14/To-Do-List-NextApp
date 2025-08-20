@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -27,7 +26,8 @@ export default function Home() {
     console.log("Hello " + JSON.stringify(tasks));
   }, [tasks]);
 
-  const addTask = () => {
+  // Aync Here Below
+  const addTask = async () => {
     if (!taskText.trim()) return;
 
     const newTask: Task = {
@@ -37,17 +37,40 @@ export default function Home() {
       priority: Number(priority) || 0,
     };
 
+    // Enhance Below Func and Remove logs once done.
+    try {
+      const res = await fetch("api/UnknownTaskAPI", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ taskText }),
+      });
+
+      const data = await res.json();
+      console.log("Response" + data.message);
+    } catch (err: any) {
+      console.log(`Error ` + err.message);
+    }
+
     setTasks([...tasks, newTask]);
     setTaskText("");
     setPriority("");
   };
 
-  const toggleTask = (id: number) => {
+  // Async To Be Removed
+  const toggleTask = async (id: number) => {
     setTasks(
       tasks.map((task) =>
         task.id === id ? { ...task, completed: !task.completed } : task
       )
     );
+
+    // To Be Removed
+    const res = await fetch("api/UnknownTaskAPI");
+    const data = await res.json();
+    const allTasks = data.map((task: { taskName: string }) => task.taskName);
+    console.log(allTasks);
   };
 
   const deleteTask = (id: number) => {
