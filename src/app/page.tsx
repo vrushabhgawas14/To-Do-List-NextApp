@@ -49,6 +49,7 @@ export default function Home() {
 
       const data = await res.json();
       console.log("Response" + data.message);
+      // eslint-disable-next-line
     } catch (err: any) {
       console.log(`Error ` + err.message);
     }
