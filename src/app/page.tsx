@@ -3,10 +3,10 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type Task = {
-  id: number;
-  text: string;
-  completed: boolean;
-  priority: number;
+  _id: string;
+  taskName: string;
+  isCompleted: boolean;
+  priority: string;
 };
 
 export default function Home() {
@@ -15,67 +15,66 @@ export default function Home() {
   const [priority, setPriority] = useState("");
 
   useEffect(() => {
-    const storedTask = localStorage.getItem("tasks");
-    if (storedTask) {
-      setTasks(JSON.parse(storedTask));
-    }
+    const fetchTasks = async () => {
+      try {
+        const res = await fetch("api/UnknownTaskAPI");
+        const data = await res.json();
+        setTasks(data);
+      } catch (err) {
+        if (err instanceof Error) console.log("Error :" + err.message);
+      }
+    };
+    fetchTasks();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    console.log("Hello " + JSON.stringify(tasks));
-  }, [tasks]);
-
-  // Aync Here Below
   const addTask = async () => {
     if (!taskText.trim()) return;
 
-    const newTask: Task = {
-      id: Date.now(),
-      text: taskText,
-      completed: false,
-      priority: Number(priority) || 0,
-    };
-
-    // Enhance Below Func and Remove logs once done.
     try {
       const res = await fetch("api/UnknownTaskAPI", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ taskText }),
+        body: JSON.stringify({ taskText, priority }),
       });
 
-      const data = await res.json();
-      console.log("Response" + data.message);
-      // eslint-disable-next-line
-    } catch (err: any) {
-      console.log(`Error ` + err.message);
+      const newTask = await res.json();
+
+      setTasks([...tasks, newTask]);
+      setTaskText("");
+      setPriority("");
+    } catch (err) {
+      if (err instanceof Error) console.log("Error :" + err.message);
     }
-
-    setTasks([...tasks, newTask]);
-    setTaskText("");
-    setPriority("");
   };
 
-  // Async To Be Removed
-  const toggleTask = async (id: number) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
+  const toggleTask = async (id: string) => {
+    const task = tasks.find((t) => t._id === id);
+    if (!task) return;
+
+    const response = await fetch("api/UnknownTaskAPI", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id, update: { isCompleted: !task.isCompleted } }),
+    });
+    const updatedTask = await response.json();
+    setTasks((prev) =>
+      prev.map((task) => (task._id === id ? updatedTask : task))
     );
-
-    // To Be Removed
-    const res = await fetch("api/UnknownTaskAPI");
-    const data = await res.json();
-    const allTasks = data.map((task: { taskName: string }) => task.taskName);
-    console.log(allTasks);
   };
 
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  const deleteTask = async (id: string) => {
+    await fetch("api/UnknownTaskAPI", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
+    setTasks(tasks.filter((task) => task._id !== id));
   };
 
   return (
@@ -107,56 +106,65 @@ export default function Home() {
           </button>
         </div>
 
-        <ul className="space-y-3 w-full">
+        <ul className="space-y-2 w-full">
           {tasks.map((task) => (
             <li
-              key={task.id}
-              className="flex items-center gap-2 border-b-2 border-slate-900"
+              key={task._id}
+              className="flex items-center gap-2 border-b-2 border-slate-900/50"
             >
               <Image
                 src={
-                  task.completed
+                  task.isCompleted
                     ? "/assets/images/checked.png"
                     : "/assets/images/unchecked.png"
                 }
-                width="6"
-                height="6"
+                width="4"
+                height="4"
                 sizes="8vw"
                 alt="Checkbox Image"
-                className="h-6 w-6 sm:h-5 sm:w-5 cursor-pointer"
-                onClick={() => toggleTask(task.id)}
+                className="h-4 w-4 sm:h-4 sm:w-4 cursor-pointer"
+                onClick={() => toggleTask(task._id)}
               />
 
               {/* Task text */}
               <div
-                className={`flex-1 font-semibold text-md sm:text-lg break-words overflow-hidden cursor-pointer ${
-                  task.completed ? "line-through italic text-gray-800" : ""
+                className={`flex-1 font-semibold text-sm sm:text-base break-words overflow-hidden cursor-pointer ${
+                  task.isCompleted ? "line-through italic text-gray-800" : ""
                 }`}
-                onClick={() => toggleTask(task.id)}
+                onClick={() => toggleTask(task._id)}
               >
-                {task.text}
+                {task.taskName}
               </div>
 
               <input
                 type="text"
                 value={task.priority || ""} // Controlled input
-                onChange={(e) =>
+                onChange={async (e) => {
+                  const newPriority = e.target.value;
+
                   setTasks((prev) =>
                     prev.map((t) =>
-                      t.id === task.id
-                        ? { ...t, priority: Number(e.target.value) }
-                        : t
+                      t._id === task._id ? { ...t, priority: newPriority } : t
                     )
-                  )
-                }
+                  );
+
+                  await fetch("api/UnknownTaskAPI", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      id: task._id,
+                      update: { priority: newPriority },
+                    }),
+                  });
+                }}
                 className="bg-transparent outline-none border-b-2 border-black/50 text-center w-16 sm:w-12 text-lg"
                 placeholder="P"
               />
 
               <button
-                onClick={() => deleteTask(task.id)}
+                onClick={() => deleteTask(task._id)}
                 tabIndex={-1}
-                className="text-red-950 hover:bg-red-700/20 px-2 py-2 rounded-full font-bold text-2xl sm:text-lg"
+                className="text-red-950 hover:bg-red-700/20 px-2 py-2 rounded-full font-bold text-md sm:text-sm"
               >
                 ✕
               </button>
