@@ -78,7 +78,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center sm:-translate-y-40">
+    <main className="min-h-screen flex items-center justify-center translate-x-0 translate-y-0">
       <div className="bg-red-200/40 p-8 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
         <h1 className="text-center text-white text-xl font-bold mb-4 bg-gradient-to-r from-violet-900 to-blue-900 py-2 rounded-full">
           To Do List
@@ -157,8 +157,10 @@ export default function Home() {
                     }),
                   });
                 }}
-                className="bg-transparent outline-none border-b-2 border-black/50 text-center w-16 sm:w-12 text-lg"
-                placeholder="P"
+                className={`bg-transparent outline-none border-b-2 border-black/50 text-center w-16 sm:w-12 text-lg  ${
+                  task.isCompleted ? "line-through italic text-gray-800" : ""
+                }`}
+                placeholder="Text"
               />
 
               <button
