@@ -1,5 +1,7 @@
 import { connectDatabase } from "@/lib/mongoDB";
+import { LoggedInTasks } from "@/models/loggedInTasks";
 import { UnknownTasks } from "@/models/UnknownTasks";
+import { useSession } from "next-auth/react";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET all Tasks
@@ -7,7 +9,15 @@ export const GET = async () => {
   try {
     await connectDatabase();
 
-    const allTask = await UnknownTasks.find({});
+    let allTask = [];
+    // const { data: session } = useSession();
+
+    // if (session?.user) {
+    //   allTask = await LoggedInTasks.find({ user: session?.user.email });
+    // }
+
+    //Added Below
+    allTask = await UnknownTasks.find({});
     return NextResponse.json(allTask);
   } catch {
     return NextResponse.json(
@@ -22,9 +32,24 @@ export const POST = async (request: NextRequest) => {
   try {
     await connectDatabase();
     const { taskText, priority } = await request.json();
+    // const { data: session } = useSession();
 
-    const newTask = new UnknownTasks({ taskName: taskText, priority });
+    // let task = [];
+
+    // if (session?.user) {
+    //   task = new LoggedInTasks({
+    //     user: session.user?.email,
+    //     taskName: taskText,
+    //     priority: priority,
+    //   });
+    //   await task.save();
+    // } else {
+    const newTask = new UnknownTasks({
+      taskName: taskText,
+      priority: priority,
+    });
     await newTask.save();
+    // }
 
     return NextResponse.json(newTask, { status: 201 });
   } catch (err) {
@@ -41,6 +66,7 @@ export const PATCH = async (request: NextRequest) => {
     await connectDatabase();
     const { id, update } = await request.json();
 
+    // const task = await LoggedInTasks.findById(id);
     const task = await UnknownTasks.findById(id);
     if (!task) {
       return NextResponse.json({ message: "Task not found!" }, { status: 404 });
@@ -70,6 +96,7 @@ export const DELETE = async (request: NextRequest) => {
     await connectDatabase();
     const { id } = await request.json();
 
+    // await LoggedInTasks.findByIdAndDelete(id);
     await UnknownTasks.findByIdAndDelete(id);
 
     return NextResponse.json({ message: "Task Deleted!" }, { status: 201 });
