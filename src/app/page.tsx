@@ -1,7 +1,6 @@
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Task = {
@@ -143,7 +142,7 @@ export default function Home() {
     <main className="relative min-h-screen flex items-center justify-center translate-x-0 translate-y-0">
       <div className="bg-red-200/40 p-8 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
         <h1 className="text-center text-white text-xl font-bold mb-4 bg-gradient-to-r from-violet-900 to-blue-900 py-2 rounded-full">
-          Tick the Untick's
+          Tick the Untick&apos;s
         </h1>
 
         <div className="flex flex-1 items-center justify-between rounded-full bg-red-50 mb-6 border-b-2 border-t-2 border-l-2 border-slate-900">

@@ -1,7 +1,7 @@
 import { connectDatabase } from "@/lib/mongoDB";
-import { LoggedInTasks } from "@/models/loggedInTasks";
+// import { LoggedInTasks } from "@/models/loggedInTasks";
 import { UnknownTasks } from "@/models/UnknownTasks";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET all Tasks
