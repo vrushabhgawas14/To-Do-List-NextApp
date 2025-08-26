@@ -66,7 +66,7 @@ export default function Home() {
       }
     };
     fetchCategories();
-  }, []);
+  }, [session?.user]);
 
   // Guest Tasks
   useEffect(() => {

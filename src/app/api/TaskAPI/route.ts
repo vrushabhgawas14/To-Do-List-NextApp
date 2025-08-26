@@ -12,7 +12,7 @@ export const GET = async (request: NextRequest) => {
     const category = request.nextUrl.searchParams.get("category");
     const session = await getServerSession();
     if (session?.user) {
-      let query: any = { user: session.user.email };
+      const query: Record<string, unknown> = { user: session.user.email };
       if (category && category.trim() !== "") {
         query.category = category;
       }
