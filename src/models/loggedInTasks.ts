@@ -2,6 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const loggedInTasksSchema = new Schema({
   user: { type: String, required: true },
+  category: { type: String, default: "General" },
   taskName: { type: String, required: true },
   isCompleted: { type: Boolean, default: false },
   priority: { type: String, default: "" },

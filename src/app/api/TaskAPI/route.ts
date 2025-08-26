@@ -1,23 +1,23 @@
 import { connectDatabase } from "@/lib/mongoDB";
-// import { LoggedInTasks } from "@/models/loggedInTasks";
+import { LoggedInTasks } from "@/models/loggedInTasks";
 import { UnknownTasks } from "@/models/UnknownTasks";
-// import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET all Tasks
-export const GET = async () => {
+export const GET = async (request: NextRequest) => {
   try {
     await connectDatabase();
-
     let allTask = [];
-    // const { data: session } = useSession();
-
-    // if (session?.user) {
-    //   allTask = await LoggedInTasks.find({ user: session?.user.email });
-    // }
-
-    //Added Below
-    allTask = await UnknownTasks.find({});
+    const category = request.nextUrl.searchParams.get("category");
+    const session = await getServerSession();
+    if (session?.user) {
+      let query: any = { user: session.user.email };
+      if (category && category.trim() !== "") {
+        query.category = category;
+      }
+      allTask = await LoggedInTasks.find(query);
+    }
     return NextResponse.json(allTask);
   } catch {
     return NextResponse.json(
@@ -31,27 +31,28 @@ export const GET = async () => {
 export const POST = async (request: NextRequest) => {
   try {
     await connectDatabase();
-    const { taskText, priority } = await request.json();
-    // const { data: session } = useSession();
+    const { taskText, priority, category } = await request.json();
+    const session = await getServerSession();
 
-    // let task = [];
+    let task = [];
 
-    // if (session?.user) {
-    //   task = new LoggedInTasks({
-    //     user: session.user?.email,
-    //     taskName: taskText,
-    //     priority: priority,
-    //   });
-    //   await task.save();
-    // } else {
-    const newTask = new UnknownTasks({
-      taskName: taskText,
-      priority: priority,
-    });
-    await newTask.save();
-    // }
+    if (session?.user?.email) {
+      task = new LoggedInTasks({
+        user: session?.user?.email || "User Email Error",
+        taskName: taskText,
+        priority: priority,
+        category: category || "General",
+      });
+      await task.save();
+    } else {
+      const guestTask = new UnknownTasks({
+        taskName: taskText,
+        priority: priority,
+      });
+      await guestTask.save();
+    }
 
-    return NextResponse.json(newTask, { status: 201 });
+    return NextResponse.json(task, { status: 201 });
   } catch (err) {
     return NextResponse.json(
       { message: "Error Occurred : " + err },
@@ -66,8 +67,7 @@ export const PATCH = async (request: NextRequest) => {
     await connectDatabase();
     const { id, update } = await request.json();
 
-    // const task = await LoggedInTasks.findById(id);
-    const task = await UnknownTasks.findById(id);
+    const task = await LoggedInTasks.findById(id);
     if (!task) {
       return NextResponse.json({ message: "Task not found!" }, { status: 404 });
     }
@@ -96,9 +96,7 @@ export const DELETE = async (request: NextRequest) => {
     await connectDatabase();
     const { id } = await request.json();
 
-    // await LoggedInTasks.findByIdAndDelete(id);
-    await UnknownTasks.findByIdAndDelete(id);
-
+    await LoggedInTasks.findByIdAndDelete(id);
     return NextResponse.json({ message: "Task Deleted!" }, { status: 201 });
   } catch (err) {
     return NextResponse.json(
