@@ -26,6 +26,7 @@ export default function Home() {
   const [categories, setCategories] = useState<string[]>([defaultCategory]);
   const [newCategory, setNewCategory] = useState("");
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isdeleteCatBtnOpen, setDeleteCatBtnOpen] = useState(false);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -57,23 +58,23 @@ export default function Home() {
     fetchTasks();
   }, [session, selectedCategory]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      if (session?.user) {
-        const res = await fetch(`api/CategoryAPI`);
-        const data = await res.json();
+  const fetchCategories = async () => {
+    if (session?.user) {
+      const res = await fetch(`api/CategoryAPI`);
+      const data = await res.json();
 
-        if (data) {
-          const uniqueCategories: string[] = Array.from(
-            new Set([
-              defaultCategory,
-              ...data?.map((t: Category) => t.categoryName),
-            ])
-          );
-          setCategories(uniqueCategories);
-        }
+      if (data) {
+        const uniqueCategories: string[] = Array.from(
+          new Set([
+            defaultCategory,
+            ...data?.map((t: Category) => t.categoryName),
+          ])
+        );
+        setCategories(uniqueCategories);
       }
-    };
+    }
+  };
+  useEffect(() => {
     fetchCategories();
   }, [session?.user]);
 
@@ -205,6 +206,29 @@ export default function Home() {
     }
   };
 
+  const handleDelete = async (selectedTaskCategory: string) => {
+    if (session?.user) {
+      const deletedResponse = await fetch("api/CategoryAPI", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          category: selectedTaskCategory,
+        }),
+      });
+
+      if (deletedResponse.status === 201) {
+        setTasks([]);
+        setSelectedCategory(defaultCategory);
+        fetchCategories();
+      }
+    } else {
+      localStorage.setItem("tasks", JSON.stringify([]));
+      setSelectedCategory(defaultCategory);
+    }
+  };
+
   const GoogleLogo = (
     <svg
       viewBox="-3 0 262 262"
@@ -227,6 +251,12 @@ export default function Home() {
         d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
         fill="#EB4335"
       ></path>
+    </svg>
+  );
+
+  const downward = (
+    <svg viewBox="0 0 330 330" className="fill-black w-3 h-3">
+      <path d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393 c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393 s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"></path>
     </svg>
   );
 
@@ -256,6 +286,12 @@ export default function Home() {
                   type="text"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key == "Enter") {
+                      e.preventDefault();
+                      handleAddCategory();
+                    }
+                  }}
                   required
                   placeholder="Enter category"
                   className="px-3 py-1 rounded focus:outline-none border border-purple-300 text-purple-900"
@@ -315,12 +351,35 @@ export default function Home() {
       <main className="relative min-h-screen flex items-start justify-center translate-x-0 translate-y-0">
         <div className="bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
           {/* Category Name */}
-          <div className="py-2 flex justify-end text-sm">
-            <div className="bg-red-100/50 px-2 border border-blue-950 rounded-xl cursor-pointer">
-              Category :
-              <span className="italic pl-1">
-                {selectedCategory ? selectedCategory : defaultCategory}
-              </span>
+          <div className="py-2 flex flex-col items-end text-sm gap-y-2">
+            <div className="bg-red-100/50 px-2 border border-blue-950 rounded-xl cursor-pointer flex flex-col justify-center">
+              <div
+                className="flex items-center gap-x-2"
+                onClick={() => setDeleteCatBtnOpen(!isdeleteCatBtnOpen)}
+              >
+                Category :
+                <span className="italic">
+                  {selectedCategory ? selectedCategory : defaultCategory}
+                </span>
+                <span>{downward}</span>
+              </div>
+              {isdeleteCatBtnOpen && (
+                <button
+                  className="bg-red-100/50 px-2 my-2 border border-blue-950 rounded-xl cursor-pointer"
+                  onClick={() => {
+                    if (
+                      confirm(
+                        "All the tasks added in this category will be deleted?"
+                      )
+                    ) {
+                      handleDelete(selectedCategory);
+                      setDeleteCatBtnOpen(false);
+                    }
+                  }}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           </div>
 
