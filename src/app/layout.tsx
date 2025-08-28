@@ -6,7 +6,7 @@ import RootLayoutClient from "@/lib/RootLayoutClient";
 export const metadata: Metadata = {
   metadataBase: new URL("https://untick-task.vercel.app"),
 
-  title: "To Do List",
+  title: "Untick Task",
   description: "Never miss you to do's.",
 };
 

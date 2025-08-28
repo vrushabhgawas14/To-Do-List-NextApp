@@ -11,6 +11,11 @@ type Task = {
   category?: string;
 };
 
+type Category = {
+  _id: string;
+  categoryName: string;
+};
+
 export default function Home() {
   const defaultCategory = "General";
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -54,12 +59,15 @@ export default function Home() {
   useEffect(() => {
     const fetchCategories = async () => {
       if (session?.user) {
-        const res = await fetch(`api/TaskAPI`);
+        const res = await fetch(`api/CategoryAPI`);
         const data = await res.json();
 
         if (data) {
           const uniqueCategories: string[] = Array.from(
-            new Set([defaultCategory, ...data?.map((t: Task) => t.category)])
+            new Set([
+              defaultCategory,
+              ...data?.map((t: Category) => t.categoryName),
+            ])
           );
           setCategories(uniqueCategories);
         }
@@ -172,13 +180,26 @@ export default function Home() {
     }
   };
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (newCategory.trim() !== "" && !categories.includes(newCategory)) {
-      setCategories([...categories, newCategory]);
+      const res = await fetch("api/CategoryAPI", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          category: newCategory,
+        }),
+      });
+      const newCategoryAdded = await res.json();
+
+      if (newCategoryAdded && newCategoryAdded.categoryName) {
+        setCategories([...categories, newCategoryAdded.categoryName]);
+        setSelectedCategory(newCategoryAdded.categoryName);
+      }
       setNewCategory("");
-      setSelectedCategory(newCategory);
     } else if (categories.includes(newCategory)) {
-      alert("Category Already Exists!");
+      alert("This category name already exists!");
       return;
     }
   };

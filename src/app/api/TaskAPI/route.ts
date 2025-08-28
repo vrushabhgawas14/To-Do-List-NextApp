@@ -19,9 +19,9 @@ export const GET = async (request: NextRequest) => {
       allTask = await LoggedInTasks.find(query);
     }
     return NextResponse.json(allTask);
-  } catch {
+  } catch (err) {
     return NextResponse.json(
-      { message: "Failed to fetch Data" },
+      { message: "Failed to fetch Data : " + err },
       { status: 500 }
     );
   }
