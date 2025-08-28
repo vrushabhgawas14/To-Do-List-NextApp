@@ -312,12 +312,24 @@ export default function Home() {
         </section>
       </main>
       <main className="relative min-h-screen flex items-start justify-center translate-x-0 translate-y-0">
-        <div className="bg-red-200/40 p-8 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
+        <div className="bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
+          {/* Category Name */}
+          <div className="py-2 flex justify-end text-sm">
+            <div className="bg-red-100/50 px-2 border border-blue-950 rounded-xl cursor-pointer">
+              Category :
+              <span className="italic pl-1">
+                {selectedCategory ? selectedCategory : defaultCategory}
+              </span>
+            </div>
+          </div>
+
+          {/* Card Header */}
           <h1 className="text-center text-white text-xl font-bold mb-4 bg-gradient-to-r from-violet-900 to-blue-900 py-2 rounded-full">
             Tick the Untick&apos;s
           </h1>
 
-          <div className="flex flex-1 items-center justify-between rounded-full bg-red-50 mb-6 border-b-2 border-t-2 border-l-2 border-slate-900">
+          {/* Task Input */}
+          <div className="flex flex-1 items-center justify-between rounded-full bg-red-50 mb-6 border-b border-t border-l border-blue-950">
             <input
               type="text"
               className="px-4 py-1 text-md sm:text-sm outline-none bg-red-50/80 rounded-full text-black font-semibold w-[100%]"
@@ -338,6 +350,8 @@ export default function Home() {
               Add
             </button>
           </div>
+
+          {/* Added Tasks */}
           {isDataLoading ? (
             <div className="text-center italic">Loading...</div>
           ) : (
