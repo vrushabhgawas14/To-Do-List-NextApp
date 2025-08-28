@@ -32,6 +32,7 @@ export default function Home() {
     const fetchTasks = async () => {
       try {
         if (session?.user) {
+          setIsDataLoading(true);
           const res = await fetch(
             `api/TaskAPI?category=${
               selectedCategory ? selectedCategory : defaultCategory
