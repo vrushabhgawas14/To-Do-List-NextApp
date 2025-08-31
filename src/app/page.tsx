@@ -45,6 +45,10 @@ export default function Home() {
             setTasks(data);
             setIsDataLoading(false);
           }
+
+          if (selectedCategory) {
+            localStorage.setItem("lastCat", selectedCategory);
+          }
         } else {
           // Guest Tasks
           const storedTask = localStorage.getItem("tasks");
@@ -72,6 +76,8 @@ export default function Home() {
         );
         setCategories(uniqueCategories);
       }
+      const lastCat = localStorage.getItem("lastCat");
+      if (lastCat != null) setSelectedCategory(lastCat);
     }
   };
   useEffect(() => {
@@ -206,7 +212,7 @@ export default function Home() {
     }
   };
 
-  const handleDelete = async (selectedTaskCategory: string) => {
+  const handleDeleteCategory = async (selectedTaskCategory: string) => {
     if (session?.user) {
       const deletedResponse = await fetch("api/CategoryAPI", {
         method: "DELETE",
@@ -221,6 +227,7 @@ export default function Home() {
       if (deletedResponse.status === 201) {
         setTasks([]);
         setSelectedCategory(defaultCategory);
+        localStorage.setItem("lastCat", "");
         fetchCategories();
       }
     } else {
@@ -330,7 +337,10 @@ export default function Home() {
               </div>
               {isLogoutBtnOpen && (
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => {
+                    signOut();
+                    localStorage.setItem("lastCat", "");
+                  }}
                   className="px-4 py-1 text-red-100 border-2 border-red-100 border-opacity-90 rounded-xl ease-in duration-200 hover:bg-purple-200 hover:text-violet-950 font-semibold hover:border-zinc-200/40"
                 >
                   LogOut
@@ -372,7 +382,7 @@ export default function Home() {
                         "All the tasks added in this category will be deleted?"
                       )
                     ) {
-                      handleDelete(selectedCategory);
+                      handleDeleteCategory(selectedCategory);
                       setDeleteCatBtnOpen(false);
                     }
                   }}
@@ -452,7 +462,7 @@ export default function Home() {
                       type="text"
                       value={task.priority || ""} // Controlled input
                       onChange={(e) => updatePriority(task._id, e.target.value)}
-                      className={`bg-transparent outline-none border-b-2 border-black/50 text-center w-16 sm:w-12 text-lg  ${
+                      className={`bg-transparent outline-none border-b-2 border-black/50 text-center w-16 sm:w-12 text-sm sm:text-sm  ${
                         task.isCompleted
                           ? "line-through italic text-gray-800"
                           : ""
