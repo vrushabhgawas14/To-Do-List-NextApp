@@ -1,4 +1,5 @@
 "use client";
+import { Menu, X } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -27,6 +28,7 @@ export default function Home() {
   const [newCategory, setNewCategory] = useState("");
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [isdeleteCatBtnOpen, setDeleteCatBtnOpen] = useState(false);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -270,48 +272,78 @@ export default function Home() {
   return (
     <>
       <main className="flex justify-between p-4 w-full">
-        {/* Sidebar (only for logged in users) */}
-        <section className="w-[50%]">
+        {/* Hamburger Menu */}
+        <section>
           {session?.user && (
-            <div className="bg-purple-900 text-white p-4">
-              <h2 className="font-bold mb-3">Categories</h2>
-              <div>
-                {categories?.map((cat, index) => (
-                  <div
-                    key={index}
-                    className={`cursor-pointer p-1 rounded ${
-                      selectedCategory === cat ? "bg-purple-700" : ""
-                    }`}
-                    onClick={() => setSelectedCategory(cat)}
-                  >
-                    {cat}
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-2 py-4 sm:flex-col">
-                <input
-                  type="text"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key == "Enter") {
-                      e.preventDefault();
-                      handleAddCategory();
-                    }
-                  }}
-                  required
-                  placeholder="Enter category"
-                  className="px-3 py-1 rounded focus:outline-none border border-purple-300 text-purple-900"
-                />
+            <>
+              {!isSidebarOpen && (
                 <button
-                  type="button"
-                  onClick={handleAddCategory}
-                  className="bg-white text-purple-900 px-3 py-1 rounded font-medium hover:bg-purple-100"
+                  onClick={() => setSidebarOpen(true)}
+                  className="absolute top-4 left-4 z-50 p-2 bg-purple-950 text-white rounded-md"
                 >
-                  Create
+                  <Menu size={24} />
                 </button>
+              )}
+              {/* Sidebar */}
+              <div
+                className={`fixed top-0 left-0 h-screen w-64 bg-purple-950 text-white p-4 transform transition-transform duration-300 z-40
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+              >
+                {/* Sidebar content */}
+                {session?.user && (
+                  <div className="flex flex-col gap-y-5">
+                    <div className="flex justify-between my-2">
+                      <h2 className="font-bold text-lg">Categories</h2>
+                      <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="text-white"
+                      >
+                        <X size={24} />
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      {categories?.map((cat, index) => (
+                        <div
+                          key={index}
+                          className={`cursor-pointer p-1 rounded font-semibold ${
+                            selectedCategory === cat ? "bg-purple-800" : ""
+                          }`}
+                          onClick={() => {
+                            setSelectedCategory(cat);
+                            setSidebarOpen(false);
+                          }}
+                        >
+                          {cat}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 py-4 flex-col">
+                      <input
+                        type="text"
+                        value={newCategory}
+                        onChange={(e) => setNewCategory(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key == "Enter") {
+                            e.preventDefault();
+                            handleAddCategory();
+                          }
+                        }}
+                        required
+                        placeholder="Enter category"
+                        className="px-3 py-1 rounded focus:outline-none border border-purple-300 text-purple-900 font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddCategory}
+                        className="bg-white text-purple-900 px-3 py-1 rounded font-medium hover:bg-purple-100"
+                      >
+                        Create
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            </>
           )}
         </section>
         <section className="min-w-max">
@@ -322,9 +354,11 @@ export default function Home() {
               border-2 border-zinc-200/40 px-2 py-1 rounded-xl"
                 onClick={() => setLogoutBtnOpen(!isLogoutBtnOpen)}
               >
-                <h2 className="text-zinc-200 font-semibold">
-                  {session?.user?.name || session?.user?.email}
-                </h2>
+                {isLogoutBtnOpen && (
+                  <h2 className="text-zinc-200 font-semibold">
+                    {session?.user?.name || session?.user?.email}
+                  </h2>
+                )}
                 {session?.user?.image && (
                   <Image
                     height={50}
