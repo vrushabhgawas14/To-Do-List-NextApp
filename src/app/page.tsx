@@ -423,21 +423,27 @@ export default function Home() {
                 <span>{downward}</span>
               </div>
               {isdeleteCatBtnOpen && (
-                <button
-                  className="bg-red-100/50 px-2 my-2 border border-blue-950 rounded-xl cursor-pointer"
-                  onClick={() => {
-                    if (
-                      confirm(
-                        "All the tasks added in this category will be deleted?"
-                      )
-                    ) {
+                <>
+                  <button
+                    className="bg-red-100/50 px-2 my-2 border border-blue-950 rounded-xl cursor-pointer"
+                    onClick={() => setDialogOpen(true)}
+                  >
+                    Delete
+                  </button>
+                  <ConfirmDialog
+                    isOpen={isDialogOpen}
+                    message="Are you sure to delete Category and tasks in it?"
+                    onConfirm={() => {
                       handleDeleteCategory(selectedCategory);
                       setDeleteCatBtnOpen(false);
-                    }
-                  }}
-                >
-                  Delete
-                </button>
+                      setDialogOpen(false);
+                    }}
+                    onCancel={() => {
+                      setDeleteCatBtnOpen(false);
+                      setDialogOpen(false);
+                    }}
+                  />
+                </>
               )}
             </div>
           </div>
