@@ -1,4 +1,5 @@
 "use client";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { Menu, X } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -29,6 +30,7 @@ export default function Home() {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [isdeleteCatBtnOpen, setDeleteCatBtnOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isDialogOpen, setDialogOpen] = useState(false);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -348,7 +350,7 @@ export default function Home() {
         </section>
         <section className="min-w-max">
           {session?.user ? (
-            <div className="flex flex-col gap-y-2">
+            <div className="flex flex-col gap-y-2 relative">
               <div
                 className="flex items-center gap-x-5 cursor-pointer bg-violet-800  
               border-2 border-zinc-200/40 px-2 py-1 rounded-xl"
@@ -365,20 +367,33 @@ export default function Home() {
                     width={50}
                     src={session.user?.image}
                     alt="My Image"
-                    className="w-8 h-8 border-2 border-white rounded-3xl"
+                    className="w-8 h-8 border border-white rounded-3xl"
                   />
                 )}
               </div>
               {isLogoutBtnOpen && (
-                <button
-                  onClick={() => {
-                    signOut();
-                    localStorage.setItem("lastCat", "");
-                  }}
-                  className="px-4 py-1 text-red-100 border-2 border-red-100 border-opacity-90 rounded-xl ease-in duration-200 hover:bg-purple-200 hover:text-violet-950 font-semibold hover:border-zinc-200/40"
-                >
-                  LogOut
-                </button>
+                <>
+                  <button
+                    onClick={() => setDialogOpen(true)}
+                    className="absolute top-14 right-0 z-50 text-sm px-8 py-1 text-red-100 border-2 border-red-100 border-opacity-90 rounded-xl ease-in duration-200 hover:bg-purple-200 hover:text-violet-950 font-semibold hover:border-zinc-200/40"
+                  >
+                    LogOut
+                  </button>
+                  <ConfirmDialog
+                    isOpen={isDialogOpen}
+                    message="Are you sure you want to logout?"
+                    onConfirm={() => {
+                      signOut();
+                      localStorage.setItem("lastCat", "");
+                      setDialogOpen(false);
+                      setLogoutBtnOpen(false);
+                    }}
+                    onCancel={() => {
+                      setDialogOpen(false);
+                      setLogoutBtnOpen(false);
+                    }}
+                  />
+                </>
               )}
             </div>
           ) : (
@@ -393,7 +408,7 @@ export default function Home() {
         </section>
       </main>
       <main className="relative min-h-screen flex items-start justify-center translate-x-0 translate-y-0">
-        <div className="bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
+        <div className="mt-14 bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
           {/* Category Name */}
           <div className="py-2 flex flex-col items-end text-sm gap-y-2">
             <div className="bg-red-100/50 px-2 border border-blue-950 rounded-xl cursor-pointer flex flex-col justify-center">
