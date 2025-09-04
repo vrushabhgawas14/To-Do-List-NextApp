@@ -282,6 +282,7 @@ export default function Home() {
                 <button
                   onClick={() => setSidebarOpen(true)}
                   className="absolute top-4 left-4 z-50 p-2 bg-purple-950 text-white rounded-md"
+                  tabIndex={-1}
                 >
                   <Menu size={24} />
                 </button>
@@ -299,6 +300,7 @@ export default function Home() {
                       <button
                         onClick={() => setSidebarOpen(false)}
                         className="text-white"
+                        tabIndex={-1}
                       >
                         <X size={24} />
                       </button>
@@ -307,7 +309,7 @@ export default function Home() {
                       {categories?.map((cat, index) => (
                         <div
                           key={index}
-                          className={`cursor-pointer p-1 rounded font-semibold ${
+                          className={`cursor-pointer p-1 rounded font-semibold hover:bg-purple-900 ${
                             selectedCategory === cat ? "bg-purple-800" : ""
                           }`}
                           onClick={() => {
@@ -333,11 +335,13 @@ export default function Home() {
                         required
                         placeholder="Enter category"
                         className="px-3 py-1 rounded focus:outline-none border border-purple-300 text-purple-900 font-semibold"
+                        tabIndex={-1}
                       />
                       <button
                         type="button"
                         onClick={handleAddCategory}
                         className="bg-white text-purple-900 px-3 py-1 rounded font-medium hover:bg-purple-100"
+                        tabIndex={-1}
                       >
                         Create
                       </button>
@@ -408,7 +412,7 @@ export default function Home() {
         </section>
       </main>
       <main className="relative min-h-screen flex items-start justify-center translate-x-0 translate-y-0">
-        <div className="mt-14 bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
+        <div className="sm:mt-10 md:mt-5 bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
           {/* Category Name */}
           <div className="py-2 flex flex-col items-end text-sm gap-y-2">
             <div className="bg-red-100/50 px-2 border border-blue-950 rounded-xl cursor-pointer flex flex-col justify-center">
@@ -538,6 +542,13 @@ export default function Home() {
           )}
         </div>
       </main>
+      <footer className="text-center text-blue-200 font-semibold my-2">
+        © 2025 Developed by{" "}
+        <a href="https://vrushabhgawas14.github.io" className="underline">
+          Vrushabh Gawas
+        </a>
+        .
+      </footer>
     </>
   );
 }
