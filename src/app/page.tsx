@@ -85,8 +85,10 @@ export default function Home() {
     }
   };
   useEffect(() => {
-    fetchCategories();
-  }, [session?.user]);
+    if (session?.user) {
+      fetchCategories();
+    }
+  }, [session?.user?.email]);
 
   // Guest Tasks
   useEffect(() => {

@@ -9,5 +9,9 @@ export default function RootLayoutClient({
   session: Session | null;
   children: React.ReactNode;
 }) {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
+  return (
+    <SessionProvider session={session} refetchOnWindowFocus={false}>
+      {children}
+    </SessionProvider>
+  );
 }
