@@ -79,11 +79,14 @@ export default function Home() {
           ])
         );
         setCategories(uniqueCategories);
+        const lastCat = localStorage.getItem("lastCat");
+        if (lastCat && uniqueCategories.includes(lastCat)) {
+          setSelectedCategory(lastCat);
+        }
       }
-      const lastCat = localStorage.getItem("lastCat");
-      if (lastCat != null) setSelectedCategory(lastCat);
     }
   };
+
   useEffect(() => {
     if (session?.user) {
       fetchCategories();
