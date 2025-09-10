@@ -30,7 +30,8 @@ export default function Home() {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [isdeleteCatBtnOpen, setDeleteCatBtnOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isLogoutConfirmationOpen, setLogoutConfirmationOpen] = useState(false);
+  const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -383,22 +384,22 @@ export default function Home() {
               {isLogoutBtnOpen && (
                 <>
                   <button
-                    onClick={() => setDialogOpen(true)}
+                    onClick={() => setLogoutConfirmationOpen(true)}
                     className="absolute top-14 right-0 z-50 text-sm px-8 py-1 text-red-100 border-2 border-red-100 border-opacity-90 rounded-xl ease-in duration-200 hover:bg-purple-200 hover:text-violet-950 font-semibold hover:border-zinc-200/40"
                   >
                     LogOut
                   </button>
                   <ConfirmDialog
-                    isOpen={isDialogOpen}
+                    isOpen={isLogoutConfirmationOpen}
                     message="Are you sure you want to logout?"
                     onConfirm={() => {
                       signOut();
                       localStorage.setItem("lastCat", "");
-                      setDialogOpen(false);
+                      setLogoutConfirmationOpen(false);
                       setLogoutBtnOpen(false);
                     }}
                     onCancel={() => {
-                      setDialogOpen(false);
+                      setLogoutConfirmationOpen(false);
                       setLogoutBtnOpen(false);
                     }}
                   />
@@ -415,6 +416,25 @@ export default function Home() {
             </button>
           )}
         </section>
+      </main>
+
+      {/* Delete Confirmation Dialog Box */}
+      <main>
+        {isdeleteCatBtnOpen && (
+          <ConfirmDialog
+            isOpen={isDeleteConfirmationOpen}
+            message="Are you sure to delete Category and tasks in it?"
+            onConfirm={() => {
+              handleDeleteCategory(selectedCategory);
+              setDeleteCatBtnOpen(false);
+              setDeleteConfirmationOpen(false);
+            }}
+            onCancel={() => {
+              setDeleteCatBtnOpen(false);
+              setDeleteConfirmationOpen(false);
+            }}
+          />
+        )}
       </main>
       <main className="relative min-h-screen flex items-start justify-center translate-x-0 translate-y-0">
         <div className="sm:mt-10 md:mt-5 bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
@@ -435,23 +455,10 @@ export default function Home() {
                 <>
                   <button
                     className="bg-red-100/50 px-2 my-2 border border-blue-950 rounded-xl cursor-pointer"
-                    onClick={() => setDialogOpen(true)}
+                    onClick={() => setDeleteConfirmationOpen(true)}
                   >
                     Delete
                   </button>
-                  <ConfirmDialog
-                    isOpen={isDialogOpen}
-                    message="Are you sure to delete Category and tasks in it?"
-                    onConfirm={() => {
-                      handleDeleteCategory(selectedCategory);
-                      setDeleteCatBtnOpen(false);
-                      setDialogOpen(false);
-                    }}
-                    onCancel={() => {
-                      setDeleteCatBtnOpen(false);
-                      setDialogOpen(false);
-                    }}
-                  />
                 </>
               )}
             </div>
