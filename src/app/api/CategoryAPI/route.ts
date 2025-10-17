@@ -28,19 +28,25 @@ export const POST = async (request: NextRequest) => {
     const { category } = await request.json();
     const session = await getServerSession();
 
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { message: "Please sign in to create new categories." },
+        { status: 401 } // unauthorized
+      );
+    }
+    
     let newCategory = [];
-    if (session?.user?.email) {
-      const categoryExist = await TaskCategory.findOne({
+    const categoryExist = await TaskCategory.findOne({
+      user: session.user.email,
+      categoryName: category,
+    });
+
+    if (!categoryExist) {
+      newCategory = new TaskCategory({
         user: session.user.email,
         categoryName: category,
       });
-      if (!categoryExist) {
-        newCategory = new TaskCategory({
-          user: session.user.email,
-          categoryName: category,
-        });
-        await newCategory.save();
-      }
+      await newCategory.save();
     }
 
     return NextResponse.json(newCategory, { status: 201 });

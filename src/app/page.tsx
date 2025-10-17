@@ -209,6 +209,13 @@ export default function Home() {
           category: newCategory,
         }),
       });
+
+      if (res.status === 401) {
+        alert(
+          "Please sign in to create categories and sync data across your devices."
+        );
+        return;
+      }
       const newCategoryAdded = await res.json();
 
       if (newCategoryAdded && newCategoryAdded.categoryName) {
@@ -282,81 +289,75 @@ export default function Home() {
       <main className="flex justify-between p-4 w-full">
         {/* Hamburger Menu */}
         <section>
-          {session?.user && (
-            <>
-              {!isSidebarOpen && (
+          {!isSidebarOpen && (
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="absolute top-4 left-4 z-50 p-2 bg-purple-950 text-white rounded-md"
+              tabIndex={-1}
+            >
+              <Menu size={24} />
+            </button>
+          )}
+          {/* Sidebar */}
+          <div
+            className={`fixed top-0 left-0 h-screen w-64 bg-purple-950 text-white p-4 transform transition-transform duration-300 z-40
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+          >
+            {/* Sidebar content */}
+            <div className="flex flex-col gap-y-5">
+              <div className="flex justify-between my-2">
+                <h2 className="font-bold text-lg">Categories</h2>
                 <button
-                  onClick={() => setSidebarOpen(true)}
-                  className="absolute top-4 left-4 z-50 p-2 bg-purple-950 text-white rounded-md"
+                  onClick={() => setSidebarOpen(false)}
+                  className="text-white"
                   tabIndex={-1}
                 >
-                  <Menu size={24} />
+                  <X size={24} />
                 </button>
-              )}
-              {/* Sidebar */}
-              <div
-                className={`fixed top-0 left-0 h-screen w-64 bg-purple-950 text-white p-4 transform transition-transform duration-300 z-40
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
-              >
-                {/* Sidebar content */}
-                {session?.user && (
-                  <div className="flex flex-col gap-y-5">
-                    <div className="flex justify-between my-2">
-                      <h2 className="font-bold text-lg">Categories</h2>
-                      <button
-                        onClick={() => setSidebarOpen(false)}
-                        className="text-white"
-                        tabIndex={-1}
-                      >
-                        <X size={24} />
-                      </button>
-                    </div>
-                    <div className="space-y-2">
-                      {categories?.map((cat, index) => (
-                        <div
-                          key={index}
-                          className={`cursor-pointer p-1 rounded font-semibold hover:bg-purple-900 ${
-                            selectedCategory === cat ? "bg-purple-800" : ""
-                          }`}
-                          onClick={() => {
-                            setSelectedCategory(cat);
-                            setSidebarOpen(false);
-                          }}
-                        >
-                          {cat}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex gap-2 py-4 flex-col">
-                      <input
-                        type="text"
-                        value={newCategory}
-                        onChange={(e) => setNewCategory(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key == "Enter") {
-                            e.preventDefault();
-                            handleAddCategory();
-                          }
-                        }}
-                        required
-                        placeholder="Enter category"
-                        className="px-3 py-1 rounded focus:outline-none border border-purple-300 text-purple-900 font-semibold"
-                        tabIndex={-1}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddCategory}
-                        className="bg-white text-purple-900 px-3 py-1 rounded font-medium hover:bg-purple-100"
-                        tabIndex={-1}
-                      >
-                        Create
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
-            </>
-          )}
+              <div className="space-y-2">
+                {categories?.map((cat, index) => (
+                  <div
+                    key={index}
+                    className={`cursor-pointer p-1 rounded font-semibold hover:bg-purple-900 ${
+                      selectedCategory === cat ? "bg-purple-800" : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setSidebarOpen(false);
+                    }}
+                  >
+                    {cat}
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2 py-4 flex-col">
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key == "Enter") {
+                      e.preventDefault();
+                      handleAddCategory();
+                    }
+                  }}
+                  required
+                  placeholder="Enter category"
+                  className="px-3 py-1 rounded focus:outline-none border border-purple-300 text-purple-900 font-semibold"
+                  tabIndex={-1}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCategory}
+                  className="bg-white text-purple-900 px-3 py-1 rounded font-medium hover:bg-purple-100"
+                  tabIndex={-1}
+                >
+                  Create
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
         <section className="min-w-max">
           {session?.user ? (
