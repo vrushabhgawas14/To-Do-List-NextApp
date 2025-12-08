@@ -16,7 +16,7 @@ export const GET = async () => {
     return NextResponse.json(allCategory);
   } catch (err) {
     return NextResponse.json(
-      { message: "Internal Server Error!"},
+      { message: "Internal Server Error!" + err},
       { status: 500 }
     );
   }
