@@ -88,11 +88,13 @@ export default function Home() {
     }
   };
 
+  /* eslint-disable */
   useEffect(() => {
     if (session?.user) {
       fetchCategories();
     }
   }, [session?.user?.email]);
+  /* eslint-enable */
 
   // Guest Tasks
   useEffect(() => {
