@@ -66,7 +66,7 @@ export const PATCH = async (request: NextRequest) => {
   try {
     await connectDatabase();
     const { id, update } = await request.json();
-
+    const session = await getServerSession();;
     const task = await LoggedInTasks.findById(id);
     if (!task) {
       return NextResponse.json({ message: "Task not found!" }, { status: 404 });
@@ -80,8 +80,10 @@ export const PATCH = async (request: NextRequest) => {
       task.priority = update.priority;
     }
 
-    await task.save();
-    return NextResponse.json(task);
+    if(session?.user){
+      await task.save();
+      return NextResponse.json(task);
+    }
   } catch (err) {
     return NextResponse.json(
       { message: "Error Occurred : " + err },
@@ -95,9 +97,13 @@ export const DELETE = async (request: NextRequest) => {
   try {
     await connectDatabase();
     const { id } = await request.json();
+    const session = await getServerSession();
 
-    await LoggedInTasks.findByIdAndDelete(id);
-    return NextResponse.json({ message: "Task Deleted!" }, { status: 201 });
+    if(session?.user){
+      await LoggedInTasks.findByIdAndDelete(id);
+
+      return NextResponse.json({ message: "Task Deleted!" }, { status: 201 });
+    }
   } catch (err) {
     return NextResponse.json(
       { message: "Error Occurred : " + err },

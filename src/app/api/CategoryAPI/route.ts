@@ -16,7 +16,7 @@ export const GET = async () => {
     return NextResponse.json(allCategory);
   } catch (err) {
     return NextResponse.json(
-      { message: "Failed to fetch Data : " + err },
+      { message: "Internal Server Error!"},
       { status: 500 }
     );
   }
