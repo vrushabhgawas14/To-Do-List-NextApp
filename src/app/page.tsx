@@ -440,7 +440,7 @@ export default function Home() {
         )}
       </main>
       <main className="relative min-h-screen flex items-start justify-center translate-x-0 translate-y-0">
-        <div className="sm:mt-10 md:mt-5 bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[50%] md:w-[70%] sm:w-[90%] relative">
+        <div className="sm:mt-10 md:mt-5 bg-red-200/40 p-8 pt-2 sm:px-4 rounded-2xl shadow-lg w-[60%] md:w-[70%] sm:w-[90%] relative">
           {/* Category Name */}
           <div className="py-2 flex flex-col items-end text-sm gap-y-2">
             <div className="bg-red-100/50 px-2 border border-blue-950 rounded-xl cursor-pointer flex flex-col justify-center">
@@ -536,7 +536,7 @@ export default function Home() {
                       type="text"
                       value={task.priority || ""} // Controlled input
                       onChange={(e) => updatePriority(task._id, e.target.value)}
-                      className={`bg-transparent outline-none border-b-2 border-black/50 text-center w-16 sm:w-12 text-sm sm:text-sm  ${
+                      className={`bg-transparent outline-none border-b-2 border-black/50 text-center w-28 sm:w-12 text-sm sm:text-sm  ${
                         task.isCompleted
                           ? "line-through italic text-gray-800"
                           : ""
