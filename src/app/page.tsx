@@ -72,7 +72,7 @@ export default function Home() {
       const res = await fetch(`api/CategoryAPI`);
       const data = await res.json();
 
-      if (data) {
+      if (Array.isArray(data)) {
         const uniqueCategories: string[] = Array.from(
           new Set([
             defaultCategory,

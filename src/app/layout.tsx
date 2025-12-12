@@ -3,12 +3,12 @@ import "./index.css";
 import { getServerSession } from "next-auth";
 import RootLayoutClient from "@/lib/RootLayoutClient";
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://untick-task.vercel.app"),
+// export const metadata: Metadata = {
+//   metadataBase: new URL("https://untick-task.vercel.app"),
 
-  title: "Untick Task",
-  description: "Never miss you to do's.",
-};
+//   title: "Untick Task",
+//   description: "Never miss you to do's.",
+// };
 
 export default async function RootLayout({
   children,
