@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: to-do-list-nextapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
