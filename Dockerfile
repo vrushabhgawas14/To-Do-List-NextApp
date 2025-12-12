@@ -54,7 +54,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 # Copy Next.js config (used by the runtime for certain features)
-COPY --from=builder /app/next.config.ts ./next.config.ts
+# COPY --from=builder /app/next.config.ts ./next.config.ts
 
 # Expose the Next.js port
 EXPOSE 3000
