@@ -24,7 +24,7 @@ RUN npm ci
 # --- Builder stage ---
 FROM base AS builder
 
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 
 # Reuse node_modules from deps
 COPY --from=deps /app/node_modules ./node_modules
