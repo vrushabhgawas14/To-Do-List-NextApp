@@ -66,7 +66,7 @@ export const PATCH = async (request: NextRequest) => {
   try {
     await connectDatabase();
     const { id, update } = await request.json();
-    const session = await getServerSession();;
+    const session = await getServerSession();
     const task = await LoggedInTasks.findById(id);
     if (!task) {
       return NextResponse.json({ message: "Task not found!" }, { status: 404 });

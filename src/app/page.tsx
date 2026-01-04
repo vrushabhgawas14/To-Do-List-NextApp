@@ -106,6 +106,18 @@ export default function Home() {
   const addTask = async () => {
     if (!taskText.trim()) return;
 
+    const tempID = `temp-${Date.now()}`;
+
+    const newTask: Task = {
+      _id: tempID,
+      taskName: taskText,
+      isCompleted: false,
+      priority: priority,
+      category: selectedCategory || defaultCategory,
+    };
+
+    setTasks([...tasks, newTask]);
+
     try {
       const res = await fetch("api/TaskAPI", {
         method: "POST",
@@ -120,23 +132,18 @@ export default function Home() {
       });
 
       if (session?.user) {
-        const newTask = await res.json();
-        setTasks([...tasks, newTask]);
-      } else {
-        const newTask: Task = {
-          _id: Date.now().toString(),
-          taskName: taskText,
-          isCompleted: false,
-          priority: priority,
-          category: defaultCategory,
-        };
-        setTasks([...tasks, newTask]);
+        const updatedTaskID = await res.json();
+        setTasks((prev) =>
+          prev.map((t) => (t._id === tempID ? updatedTaskID : t))
+        );
       }
 
       setTaskText("");
       setPriority("");
     } catch (err) {
       if (err instanceof Error) console.log("Error :" + err.message);
+      // Rollback if API fails
+      setTasks((prev) => prev.filter((t) => t._id !== tempID));
     }
   };
 
@@ -144,8 +151,16 @@ export default function Home() {
     const task = tasks.find((t) => t._id === id);
     if (!task) return;
 
-    if (session?.user) {
-      const response = await fetch("api/TaskAPI", {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task._id === id ? { ...task, isCompleted: !task.isCompleted } : task
+      )
+    );
+
+    if (!session?.user) return;
+
+    try {
+      await fetch("api/TaskAPI", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -155,14 +170,13 @@ export default function Home() {
           update: { isCompleted: !task.isCompleted },
         }),
       });
-      const updatedTask = await response.json();
+    } catch (err) {
+      console.error("Toggle failed, reverting UI");
+
+      // Rollback
       setTasks((prev) =>
-        prev.map((task) => (task._id === id ? updatedTask : task))
-      );
-    } else {
-      setTasks(
-        tasks.map((task) =>
-          task._id === id ? { ...task, isCompleted: !task.isCompleted } : task
+        prev.map((t) =>
+          t._id === id ? { ...t, isCompleted: task.isCompleted } : t
         )
       );
     }
@@ -186,6 +200,7 @@ export default function Home() {
   };
 
   const deleteTask = async (id: string) => {
+    setTasks(tasks.filter((task) => task._id !== id));
     if (session?.user) {
       await fetch("api/TaskAPI", {
         method: "DELETE",
@@ -194,9 +209,6 @@ export default function Home() {
         },
         body: JSON.stringify({ id }),
       });
-      setTasks(tasks.filter((task) => task._id !== id));
-    } else {
-      setTasks(tasks.filter((task) => task._id !== id));
     }
   };
 
@@ -504,32 +516,35 @@ export default function Home() {
                 tasks?.map((task) => (
                   <li
                     key={task._id}
-                    className="flex items-center gap-2 border-b-2 border-slate-900/50"
+                    className="flex items-center gap-2 border-b-2 border-slate-900/50 hover:bg-black/15 rounded-md"
                   >
-                    <Image
-                      src={
-                        task.isCompleted
-                          ? "/assets/images/checked.png"
-                          : "/assets/images/unchecked.png"
-                      }
-                      width="4"
-                      height="4"
-                      sizes="8vw"
-                      alt="Checkbox Image"
-                      className="h-4 w-4 sm:h-4 sm:w-4 cursor-pointer"
-                      onClick={() => toggleTask(task._id)}
-                    />
-
-                    {/* Task text */}
                     <div
-                      className={`flex-1 font-semibold text-sm sm:text-base break-words overflow-hidden cursor-pointer ${
-                        task.isCompleted
-                          ? "line-through italic text-gray-800"
-                          : ""
-                      }`}
+                      className="flex items-center gap-2 flex-1 p-2 cursor-pointer"
                       onClick={() => toggleTask(task._id)}
                     >
-                      {task.taskName}
+                      <Image
+                        src={
+                          task.isCompleted
+                            ? "/assets/images/checked.png"
+                            : "/assets/images/unchecked.png"
+                        }
+                        width="4"
+                        height="4"
+                        sizes="8vw"
+                        alt="Checkbox Image"
+                        className="h-4 w-4 sm:h-4 sm:w-4 cursor-pointer"
+                      />
+
+                      {/* Task text */}
+                      <div
+                        className={`flex-1 font-semibold text-sm sm:text-base break-words overflow-hidden ${
+                          task.isCompleted
+                            ? "line-through italic text-gray-800"
+                            : ""
+                        }`}
+                      >
+                        {task.taskName}
+                      </div>
                     </div>
 
                     <input
