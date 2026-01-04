@@ -107,12 +107,17 @@ export default function Home() {
     if (!taskText.trim()) return;
 
     const tempID = `temp-${Date.now()}`;
+    const currentTaskText = taskText;
+    const currentPriority = priority;
+
+    setTaskText("");
+    setPriority("");
 
     const newTask: Task = {
       _id: tempID,
-      taskName: taskText,
+      taskName: currentTaskText,
       isCompleted: false,
-      priority: priority,
+      priority: currentPriority,
       category: selectedCategory || defaultCategory,
     };
 
@@ -125,8 +130,8 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          taskText,
-          priority,
+          taskText: currentTaskText,
+          priority: currentPriority,
           category: selectedCategory,
         }),
       });
@@ -137,9 +142,6 @@ export default function Home() {
           prev.map((t) => (t._id === tempID ? updatedTaskID : t))
         );
       }
-
-      setTaskText("");
-      setPriority("");
     } catch (err) {
       if (err instanceof Error) console.log("Error :" + err.message);
       // Rollback if API fails
