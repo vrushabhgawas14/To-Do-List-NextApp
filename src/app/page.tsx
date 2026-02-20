@@ -5,10 +5,6 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-export const metadata = {
-  title: "Untick Task",
-};
-
 type Task = {
   _id: string;
   taskName: string;
