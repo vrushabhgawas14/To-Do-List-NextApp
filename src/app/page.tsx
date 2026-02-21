@@ -304,6 +304,7 @@ export default function Home() {
     <>
       <main className="flex justify-between p-4 w-full">
         {/* Hamburger Menu */}
+        <p className="sr-only">Developed By Vrushabh Gawas!</p>
         <section>
           {!isSidebarOpen && (
             <button

@@ -5,7 +5,7 @@ import RootLayoutClient from "@/lib/RootLayoutClient";
 
 export const metadata: Metadata = {
   title: "Untick Task",
-  description: "Never Miss Your To Do's!",
+  description: "Mark Your To Do's! - By Vrushabh Gawas",
   keywords: [
     "Vrushabh Gawas",
     "Untick Task",
