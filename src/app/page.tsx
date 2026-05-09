@@ -577,7 +577,7 @@ export default function Home() {
       </main>
       <footer className="text-center text-blue-200 font-semibold my-2">
         © 2025 Developed by{" "}
-        <a href="https://vrushabhgawas14.github.io" className="underline">
+        <a href="https://vrushabhgawas.in" className="underline">
           Vrushabh Gawas
         </a>
         .
